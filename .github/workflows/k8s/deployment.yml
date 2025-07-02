@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: github-actions-abcd0123
+  name: github-actions-abcd0123-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: github-actions-abcd0123
+  template:
+    metadata:
+      labels:
+        app: github-actions-abcd0123
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: project-env-secret
+        image: $FULL_IMAGE_WITH_TAG
+        imagePullPolicy: Always
+        name: github-actions-abcd0123
+        ports:
+        - containerPort: 3000
+        readinessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          tcpSocket:
+            port: 3000
+        resources:
+          limits:
+            cpu: 1000m
+            memory: '2147483648'
+          requests:
+            cpu: 50m
+            memory: 50Mi
+        startupProbe:
+          failureThreshold: 30
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          tcpSocket:
+            port: 3000
+      imagePullSecrets:
+      - name: regcred
